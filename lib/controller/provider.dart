@@ -8,6 +8,7 @@ class TodoProvider extends ChangeNotifier {
   TodoService todoservice = TodoService();
   List<TodoModel> todolist = [];
 
+
   void getTodo() async {
     try {
       todolist = await todoservice.getData();
