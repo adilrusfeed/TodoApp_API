@@ -13,12 +13,16 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Todo"),
+        title: Text(
+          "Todo",
+          style: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 40),
+        ),
         centerTitle: true,
         backgroundColor: Colors.black,
       ),
       body: Container(
-        color: Colors.pink,
+        color: const Color.fromARGB(255, 0, 0, 0),
         child: Padding(
           padding: EdgeInsets.all(10),
           child: Column(children: [
@@ -33,14 +37,22 @@ class HomeScreen extends StatelessWidget {
                           final todo = value.todolist[data];
                           return GestureDetector(
                             onTap: () {
-                            
+                              // Set controllers with the values of the selected todo
+                              final todo = value.todolist[data];
+                              Provider.of<TodoProvider>(context, listen: false)
+                                  .titleController
+                                  .text = todo.title.toString();
+                              Provider.of<TodoProvider>(context, listen: false)
+                                  .discriptController
+                                  .text = todo.discription.toString();
+
+                              // Navigate to ContentPage
                               Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ContentPage(
-                                  
-                                    ),
-                                  ));
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ContentPage(),
+                                ),
+                              );
                             },
                             child: Card(
                               color: Color.fromARGB(255, 255, 255, 255),
@@ -105,48 +117,73 @@ class HomeScreen extends StatelessWidget {
 
   void addScreen(context) {
     final todoprovider = Provider.of<TodoProvider>(context, listen: false);
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Add Data"),
-          content: Column(
-            children: [
-              TextFormField(
-                controller: todoprovider.titleController,
-                decoration: InputDecoration(
-                    labelText: "Enter the title...",
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    )),
-              ),
-              SizedBox(height: 15),
-              TextFormField(
-                maxLines: 5,
-                controller: todoprovider.discriptController,
-                decoration: InputDecoration(
-                    labelText: "Enter the subject",
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20))),
-              ),
-            ],
+        return SimpleDialog(
+          title: Text(
+            "Add Data",
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text("Cancel"),
+          contentPadding: EdgeInsets.all(20),
+          children: [
+            TextFormField(
+              controller: todoprovider.titleController,
+              decoration: InputDecoration(
+                labelText: "Enter the title...",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
             ),
-            TextButton(
-              child: Text("Save"),
-              onPressed: () {
-                todoprovider.createTodo();
-                Navigator.pop(context);
-                todoprovider.titleController.clear();
-                todoprovider.discriptController.clear();
-              },
-            )
+            SizedBox(height: 15),
+            TextFormField(
+              maxLines: 5,
+              controller: todoprovider.discriptController,
+              decoration: InputDecoration(
+                labelText: "Enter the subject",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    "Cancel",
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    todoprovider.createTodo();
+                    Navigator.pop(context);
+                    todoprovider.titleController.clear();
+                    todoprovider.discriptController.clear();
+
+                    // Show SnackBar after adding a new todo
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          "Added successfully",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  },
+                  child: Text("Save"),
+                ),
+              ],
+            ),
           ],
         );
       },
